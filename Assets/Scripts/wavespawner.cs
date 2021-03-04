@@ -25,22 +25,25 @@ public class wavespawner : MonoBehaviour{
         
     }
     
-    void UpdateTarget ()
-    {
+    void UpdateTimer ()
+    {   
+        waveCountDownText.text = "Next wave in:" + Mathf.Round(countdown).ToString();
         if (waveNum >=10){
             Debug.Log("round over");
             waveNum = 0;
-            CancelInvoke ("UpdateTarget");
+            CancelInvoke ("UpdateTimer");
         }
         if (countdown <= 0f)
         {
             StartCoroutine(SpawnWave());
             countdown = timeBetweenWaves;
+            waveCountDownText.text = "";
+            CancelInvoke ("UpdateTimer");
 
         }
         countdown -= Time.deltaTime * 2f;
         
-        waveCountDownText.text = "Next wave in:" + Mathf.Round(countdown).ToString();
+        
     }
 
     void update() {
@@ -51,15 +54,19 @@ public class wavespawner : MonoBehaviour{
     IEnumerator SpawnWave ()
     {
         waveNum++;
+        WaveTracker.text = "Waves : " + Mathf.Round(waveNum).ToString();
         if (waveNum >= 10)
         {
-            yield break;;
+            yield break;
         }
         for (int i = 0; i < waveNum; i++){
             SpawnEnemy();
             yield return new WaitForSeconds(0.5f);
         }
-        WaveTracker.text = "Waves : " + Mathf.Round(waveNum).ToString();
+
+        InvokeRepeating("UpdateTimer", 0f, Time.deltaTime);
+
+        
         
         
     }
@@ -71,8 +78,9 @@ public class wavespawner : MonoBehaviour{
 
     void TaskOnClick(){
         rounds++;
+        
         roundTracker.text = "Round :" + Mathf.Round(rounds).ToString();
-        InvokeRepeating("UpdateTarget", 0f, Time.deltaTime);
+        InvokeRepeating("UpdateTimer", 0f, Time.deltaTime);
         
         
     }
